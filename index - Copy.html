@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Happy New Year, Shahad</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;500&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Cairo", sans-serif;
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fdfdfd;
+      background: radial-gradient(circle at top, #342b77, #050815 70%);
+    }
+
+    /* خلفية متحركة خفيفة */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -40%;
+      background: radial-gradient(circle at 0% 0%, rgba(255,255,255,0.07), transparent 55%),
+                  radial-gradient(circle at 100% 100%, rgba(255,255,255,0.04), transparent 60%),
+                  radial-gradient(circle at 0% 100%, rgba(255,0,150,0.15), transparent 60%);
+      filter: blur(8px);
+      opacity: 0.9;
+      animation: glow 18s ease-in-out infinite alternate;
+      z-index: 0;
+    }
+
+    @keyframes glow {
+      0%   { transform: translate3d(-10px, 0, 0) scale(1); }
+      50%  { transform: translate3d(10px, -10px, 0) scale(1.03); }
+      100% { transform: translate3d(-6px, 6px, 0) scale(1.02); }
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .card {
+      position: relative;
+      z-index: 2;
+      width: 90%;
+      max-width: 520px;
+      padding: 30px 28px 26px;
+      border-radius: 26px;
+      background: rgba(5, 10, 30, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(18px);
+      box-shadow:
+        0 18px 60px rgba(0, 0, 0, 0.75),
+        0 0 35px rgba(123, 92, 255, 0.65);
+      text-align: center;
+      animation: cardIn 1.4s ease-out;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(26px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    h1 {
+      text-transform: uppercase;
+      letter-spacing: 0.35em;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    h2 {
+      font-size: 26px;
+      margin-bottom: 12px;
+    }
+
+    .for {
+      font-size: 13px;
+      color: #b7bcff;
+      margin-bottom: 14px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .message {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #e4e6ff;
+      margin-bottom: 20px;
+    }
+
+    .countdown-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #8f94ff;
+      margin-bottom: 8px;
+    }
+
+    .countdown {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .time-box {
+      min-width: 62px;
+      padding: 8px 6px;
+      border-radius: 12px;
+      background: rgba(15, 18, 50, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .time-number {
+      font-size: 17px;
+      font-weight: 500;
+    }
+
+    .time-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: #a3a7ff;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: #9fa3ff;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+
+    .btn {
+      margin-top: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 18px;
+      border-radius: 999px;
+      border: none;
+      background: linear-gradient(120deg, #ff8ab1, #ffda7b);
+      color: #20112a;
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(255, 180, 120, 0.8);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 0 26px rgba(255, 200, 150, 0.95);
+    }
+
+    .btn:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 0 14px rgba(255, 180, 120, 0.7);
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        padding: 24px 18px 20px;
+        border-radius: 20px;
+      }
+      h2 { font-size: 22px; }
+      h1 { font-size: 15px; letter-spacing: 0.25em; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fireworks"></canvas>
+
+  <div class="card">
+    <h1>NEW YEAR</h1>
+    <h2>Happy New Year</h2>
+    <div class="for">For Shahad</div>
+
+    <div class="message">
+      Wishing you a peaceful new year,<br />
+      filled with calm days and quiet smiles.
+    </div>
+
+    <div class="countdown-label">Countdown to midnight</div>
+    <div class="countdown" id="countdown">
+      <div class="time-box">
+        <div class="time-number" id="days">--</div>
+        <div class="time-label">Days</div>
+      </div>
+      <div class="time-box">
+        <div class="time-number" id="hours">--</div>
+        <div class="time-label">Hours</div>
+      </div>
+      <div class="time-box">
+        <div class="time-number" id="minutes">--</div>
+        <div class="time-label">Minutes</div>
+      </div>
+      <div class="time-box">
+        <div class="time-number" id="seconds">--</div>
+        <div class="time-label">Seconds</div>
+      </div>
+    </div>
+
+    <div class="hint">Tap the button or the sky for more fireworks.</div>
+
+    <button class="btn" id="burstBtn">
+      Launch Fireworks
+    </button>
+  </div>
+
+  <script>
+    // === عدّاد السنة الجديدة ===
+    function getNextNewYear() {
+      const now = new Date();
+      const nextYear = now.getFullYear() + 1;
+      // 1 Jan (0 = January)
+      return new Date(nextYear, 0, 1, 0, 0, 0);
+    }
+
+    const targetDate = getNextNewYear();
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = targetDate.getTime() - now;
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((distance / (1000 * 60)) % 60);
+      const seconds = Math.floor((distance / 1000) % 60);
+
+      document.getElementById("days").innerText = days >= 0 ? days : 0;
+      document.getElementById("hours").innerText = hours >= 0 ? hours : 0;
+      document.getElementById("minutes").innerText = minutes >= 0 ? minutes : 0;
+      document.getElementById("seconds").innerText = seconds >= 0 ? seconds : 0;
+
+      if (distance <= 0) {
+        document.querySelector(".countdown-label").innerText = "The year has begun";
+      }
+    }
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+
+    // === ألعاب نارية بسيطة بالـ Canvas ===
+    const canvas = document.getElementById("fireworks");
+    const ctx = canvas.getContext("2d");
+    let W, H;
+
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    const particles = [];
+
+    function random(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function createBurst(x, y, colorsCount = 3) {
+      const baseColors = [
+        "#ffb3c6",
+        "#ffe29f",
+        "#ff9a9e",
+        "#a1c4fd",
+        "#cfd9ff",
+        "#f6d5f7"
+      ];
+      for (let i = 0; i < 100; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = random(1.2, 4);
+        const color = baseColors[i % baseColors.length];
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          alpha: 1,
+          radius: random(1.2, 2.8),
+          color
+        });
+      }
+    }
+
+    function autoBurst() {
+      const x = random(W * 0.2, W * 0.8);
+      const y = random(H * 0.1, H * 0.5);
+      createBurst(x, y);
+    }
+
+    // burst أولي
+    setTimeout(autoBurst, 800);
+    setInterval(autoBurst, 800);
+
+    document.getElementById("burstBtn").addEventListener("click", () => {
+      createBurst(W / 2, H * 0.4);
+    });
+
+    canvas.addEventListener("click", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      createBurst(e.clientX - rect.left, e.clientY - rect.top);
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.globalCompositeOperation = "lighter";
+
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.02;
+        p.alpha -= 0.013;
+
+        if (p.alpha <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${hexToRgb(p.color)}, ${p.alpha})`;
+        ctx.fill();
+      }
+    }
+
+    function hexToRgb(hex) {
+      const c = hex.replace("#", "");
+      const bigint = parseInt(c, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return r + "," + g + "," + b;
+    }
+
+    animate();
+  </script>
+</body>
+</html>

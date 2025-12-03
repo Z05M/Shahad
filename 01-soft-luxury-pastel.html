@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Happy New Year — Shahad</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&family=Great+Vibes&display=swap" rel="stylesheet" />
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{
+      font-family:"Poppins",sans-serif;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      color:#50314f;
+      background:linear-gradient(135deg,#ffd7ec,#ffc9b8,#e3d4ff);
+      background-size:200% 200%;
+      animation:bgShift 16s ease-in-out infinite alternate;
+    }
+    @keyframes bgShift{
+      0%{background-position:0% 0%;}
+      50%{background-position:50% 100%;}
+      100%{background-position:100% 0%;}
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:-30%;
+      background:
+        radial-gradient(circle at 0% 100%,rgba(255,182,193,0.35),transparent 60%),
+        radial-gradient(circle at 100% 0%,rgba(197,225,255,0.35),transparent 55%);
+      filter:blur(14px);
+      opacity:0.85;
+      animation:glow 20s ease-in-out infinite alternate;
+      z-index:0;
+    }
+    @keyframes glow{
+      0%{transform:translate3d(-10px,0,0) scale(1);}
+      50%{transform:translate3d(10px,-8px,0) scale(1.03);}
+      100%{transform:translate3d(-6px,8px,0) scale(1.02);}
+    }
+    .sparkles{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:1;
+    }
+    .sparkle{
+      position:absolute;
+      width:4px;
+      height:4px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.9);
+      box-shadow:0 0 8px rgba(255,255,255,0.9);
+      opacity:0;
+      animation:floatUp linear infinite;
+    }
+    @keyframes floatUp{
+      0%{transform:translateY(20px) scale(0.7);opacity:0;}
+      20%{opacity:1;}
+      100%{transform:translateY(-120vh) scale(1.1);opacity:0;}
+    }
+    .card{
+      position:relative;
+      z-index:2;
+      width:90%;
+      max-width:520px;
+      padding:32px 28px 26px;
+      border-radius:28px;
+      background:rgba(255,255,255,0.94);
+      border:1px solid rgba(255,180,215,0.8);
+      box-shadow:
+        0 18px 45px rgba(219,152,190,0.45),
+        0 0 35px rgba(255,200,230,0.9);
+      backdrop-filter:blur(18px);
+      text-align:center;
+      animation:cardIn 1.2s ease-out;
+    }
+    @keyframes cardIn{
+      from{opacity:0;transform:translateY(26px) scale(0.96);}
+      to{opacity:1;transform:translateY(0) scale(1);}
+    }
+    .script-title{
+      font-family:"Great Vibes",cursive;
+      font-size:32px;
+      color:#cc4f86;
+      margin-bottom:4px;
+    }
+    h1{
+      text-transform:uppercase;
+      letter-spacing:0.18em;
+      font-size:13px;
+      color:#9c6aa0;
+      margin-bottom:10px;
+    }
+    h2{
+      font-size:26px;
+      margin-bottom:16px;
+      color:#5a335d;
+    }
+    .for{
+      font-size:14px;
+      color:#b26a9b;
+      margin-bottom:6px;
+      letter-spacing:0.18em;
+      text-transform:uppercase;
+    }
+    .tagline{
+      font-size:13px;
+      color:#885071;
+      opacity:0.9;
+      letter-spacing:0.08em;
+    }
+    .halo{
+      position:absolute;
+      inset:-20%;
+      background:radial-gradient(circle at 50% 0%,rgba(255,214,240,0.8),transparent 70%);
+      opacity:0.6;
+      mix-blend-mode:screen;
+      z-index:-1;
+      pointer-events:none;
+    }
+    @media(max-width:480px){
+      .card{padding:26px 20px 22px;border-radius:22px;}
+      h2{font-size:22px;}
+    }
+  </style>
+</head>
+<body>
+  <div class="sparkles" id="sparkles"></div>
+  <div class="card">
+    <div class="halo"></div>
+    <div class="script-title">Happy New Year</div>
+    <h1>NEW YEAR</h1>
+    <h2>Happy New Year</h2>
+    <div class="for">FOR SHAHAD</div>
+    <div class="tagline">A soft beginning for a gentle soul.</div>
+  </div>
+  <script>
+    const container = document.getElementById("sparkles");
+    const count = 40;
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement("div");
+      s.className = "sparkle";
+      const size = 2 + Math.random() * 3;
+      s.style.width = size + "px";
+      s.style.height = size + "px";
+      s.style.left = Math.random() * 100 + "vw";
+      s.style.bottom = (-10 - Math.random() * 40) + "px";
+      const duration = 6 + Math.random() * 8;
+      const delay = Math.random() * -duration;
+      s.style.animationDuration = duration + "s";
+      s.style.animationDelay = delay + "s";
+      container.appendChild(s);
+    }
+  </script>
+</body>
+</html>
