@@ -1,12 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <title>Happy New Year — Shahad</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&family=Great+Vibes&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&family=Great+Vibes&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg1: #fbe8ff;
@@ -20,11 +18,7 @@
       --text-soft: #9b6c9e;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: "Poppins", sans-serif;
@@ -35,25 +29,17 @@
       justify-content: center;
       color: var(--text-main);
       background:
-        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.9), transparent 60%),
-        radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.9), transparent 60%),
+        radial-gradient(circle at 0% 0%, rgba(255,255,255,0.9), transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(255,255,255,0.9), transparent 60%),
         linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
       background-size: 200% 200%;
       animation: bgShift 18s ease-in-out infinite alternate;
     }
 
     @keyframes bgShift {
-      0% {
-        background-position: 0% 0%;
-      }
-
-      50% {
-        background-position: 60% 100%;
-      }
-
-      100% {
-        background-position: 100% 0%;
-      }
+      0%   { background-position: 0% 0%; }
+      50%  { background-position: 60% 100%; }
+      100% { background-position: 100% 0%; }
     }
 
     .intro-fog {
@@ -61,29 +47,17 @@
       inset: 0;
       z-index: 900;
       background:
-        radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.85) 40%, rgba(255, 255, 255, 0.4) 70%, transparent 100%);
+        radial-gradient(circle at 50% 30%, rgba(255,255,255,1), rgba(255,255,255,0.85) 40%, rgba(255,255,255,0.4) 70%, transparent 100%);
       backdrop-filter: blur(18px);
-      /* تأخير ثانية */
-      animation: fogFade 2.6s ease-out 1s forwards;
+      animation: fogFade 2.6s ease-out forwards;
       pointer-events: none;
     }
 
     @keyframes fogFade {
-      0% {
-        opacity: 1;
-      }
-
-      40% {
-        opacity: 0.9;
-      }
-
-      80% {
-        opacity: 0.3;
-      }
-
-      100% {
-        opacity: 0;
-      }
+      0%   { opacity: 1; }
+      40%  { opacity: 0.9; }
+      80%  { opacity: 0.3; }
+      100% { opacity: 0; }
     }
 
     .intro-line {
@@ -94,17 +68,17 @@
       height: 1.5px;
       width: 0;
       background: linear-gradient(90deg,
-          transparent,
-          rgba(255, 255, 255, 0.9),
-          rgba(255, 255, 255, 1),
-          rgba(255, 255, 255, 0.9),
-          transparent);
+        transparent,
+        rgba(255,255,255,0.9),
+        rgba(255,255,255,1),
+        rgba(255,255,255,0.9),
+        transparent
+      );
       box-shadow:
-        0 0 14px rgba(255, 255, 255, 0.9),
-        0 0 28px rgba(255, 200, 240, 0.8);
+        0 0 14px rgba(255,255,255,0.9),
+        0 0 28px rgba(255,200,240,0.8);
       z-index: 950;
-      /* تأخير ثانية */
-      animation: introLine 2.1s ease-out 1s forwards;
+      animation: introLine 2.1s ease-out forwards;
       pointer-events: none;
     }
 
@@ -113,17 +87,14 @@
         width: 0;
         opacity: 0;
       }
-
       25% {
         width: 120px;
         opacity: 1;
       }
-
       60% {
         width: 320px;
         opacity: 1;
       }
-
       100% {
         width: 420px;
         opacity: 0;
@@ -151,46 +122,25 @@
       animation: floatAssemble 2.1s ease-out forwards;
     }
 
-    /* دفع التايم لاين ثانية كاملة لكل حرف */
-    .floating-letters span:nth-child(1) {
-      animation-delay: 1.1s;
-    }
-
-    .floating-letters span:nth-child(2) {
-      animation-delay: 1.16s;
-    }
-
-    .floating-letters span:nth-child(3) {
-      animation-delay: 1.22s;
-    }
-
-    .floating-letters span:nth-child(4) {
-      animation-delay: 1.28s;
-    }
-
-    .floating-letters span:nth-child(5) {
-      animation-delay: 1.34s;
-    }
-
-    .floating-letters span:nth-child(6) {
-      animation-delay: 1.40s;
-    }
+    .floating-letters span:nth-child(1) { animation-delay: 0.1s; }
+    .floating-letters span:nth-child(2) { animation-delay: 0.16s; }
+    .floating-letters span:nth-child(3) { animation-delay: 0.22s; }
+    .floating-letters span:nth-child(4) { animation-delay: 0.28s; }
+    .floating-letters span:nth-child(5) { animation-delay: 0.34s; }
+    .floating-letters span:nth-child(6) { animation-delay: 0.40s; }
 
     @keyframes floatAssemble {
       0% {
         opacity: 0;
         transform: translate3d(-18px, 18px, 0) scale(0.9);
       }
-
       30% {
         opacity: 1;
       }
-
       70% {
         opacity: 1;
         transform: translate3d(0, 0, 0) scale(1);
       }
-
       100% {
         opacity: 0;
         transform: translate3d(0, -8px, 0) scale(0.98);
@@ -202,9 +152,9 @@
       position: fixed;
       inset: -35%;
       background:
-        radial-gradient(circle at 10% 90%, rgba(255, 182, 193, 0.45), transparent 60%),
-        radial-gradient(circle at 90% 10%, rgba(197, 225, 255, 0.45), transparent 55%),
-        radial-gradient(circle at 40% 0%, rgba(255, 220, 190, 0.55), transparent 60%);
+        radial-gradient(circle at 10% 90%, rgba(255,182,193,0.45), transparent 60%),
+        radial-gradient(circle at 90% 10%, rgba(197,225,255,0.45), transparent 55%),
+        radial-gradient(circle at 40% 0%, rgba(255,220,190,0.55), transparent 60%);
       filter: blur(14px);
       opacity: 0.9;
       animation: glow 20s ease-in-out infinite alternate;
@@ -213,17 +163,9 @@
     }
 
     @keyframes glow {
-      0% {
-        transform: translate3d(-10px, 0, 0) scale(1);
-      }
-
-      50% {
-        transform: translate3d(14px, -10px, 0) scale(1.03);
-      }
-
-      100% {
-        transform: translate3d(-8px, 10px, 0) scale(1.02);
-      }
+      0%   { transform: translate3d(-10px, 0, 0) scale(1); }
+      50%  { transform: translate3d(14px, -10px, 0) scale(1.03); }
+      100% { transform: translate3d(-8px, 10px, 0) scale(1.02); }
     }
 
     canvas#fireworks {
@@ -246,49 +188,22 @@
       height: 120px;
       border-radius: 999px;
       background: radial-gradient(circle,
-          rgba(255, 255, 255, 0.9),
-          rgba(255, 255, 255, 0));
+        rgba(255, 255, 255, 0.9),
+        rgba(255, 255, 255, 0));
       opacity: 0.25;
       mix-blend-mode: screen;
       animation: floatOrb 14s ease-in-out infinite alternate;
     }
 
-    .orb:nth-child(1) {
-      top: 8%;
-      left: 12%;
-      animation-delay: 0s;
-    }
-
-    .orb:nth-child(2) {
-      top: 70%;
-      left: 75%;
-      animation-delay: 3s;
-    }
-
-    .orb:nth-child(3) {
-      top: 50%;
-      left: 10%;
-      animation-delay: 6s;
-    }
-
-    .orb:nth-child(4) {
-      top: 18%;
-      left: 80%;
-      animation-delay: 9s;
-    }
+    .orb:nth-child(1) { top: 8%;   left: 12%; animation-delay: 0s; }
+    .orb:nth-child(2) { top: 70%;  left: 75%; animation-delay: 3s; }
+    .orb:nth-child(3) { top: 50%;  left: 10%; animation-delay: 6s; }
+    .orb:nth-child(4) { top: 18%;  left: 80%; animation-delay: 9s; }
 
     @keyframes floatOrb {
-      0% {
-        transform: translate3d(0, 0, 0) scale(1);
-      }
-
-      50% {
-        transform: translate3d(-20px, 20px, 0) scale(1.1);
-      }
-
-      100% {
-        transform: translate3d(20px, -10px, 0) scale(1.05);
-      }
+      0%   { transform: translate3d(0, 0, 0) scale(1); }
+      50%  { transform: translate3d(-20px, 20px, 0) scale(1.1); }
+      100% { transform: translate3d(20px, -10px, 0) scale(1.05); }
     }
 
     .card {
@@ -308,51 +223,11 @@
       opacity: 0;
       transform: translateY(28px) scale(0.96);
       transition: opacity 1s ease-out, transform 1s ease-out;
-      overflow: hidden;
     }
 
     .card.show-card {
       opacity: 1;
       transform: translateY(0) scale(1);
-    }
-
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: -20%;
-      background: linear-gradient(120deg,
-          transparent 0%,
-          rgba(255, 255, 255, 0.0) 20%,
-          rgba(255, 255, 255, 0.9) 50%,
-          rgba(255, 255, 255, 0.0) 80%,
-          transparent 100%);
-      transform: translateX(-140%) skewX(-12deg);
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .card.show-card::before {
-      animation: cardSweep 1.8s ease-out 0.9s forwards;
-    }
-
-    @keyframes cardSweep {
-      0% {
-        transform: translateX(-140%) skewX(-12deg);
-        opacity: 0;
-      }
-
-      10% {
-        opacity: 1;
-      }
-
-      60% {
-        opacity: 1;
-      }
-
-      100% {
-        transform: translateX(140%) skewX(-12deg);
-        opacity: 0;
-      }
     }
 
     .halo-ring {
@@ -401,117 +276,89 @@
       color: var(--accent-strong);
       position: relative;
       overflow: hidden;
-      transform-origin: center;
-      opacity: 0;
     }
 
-    .card.show-card .name {
-      animation: nameBreath 1.8s ease-out 0.2s forwards;
-    }
-
-    @keyframes nameBreath {
-      0% {
-        transform: scale(0.88);
-        opacity: 0;
-      }
-
-      35% {
-        transform: scale(1.06);
-        opacity: 1;
-      }
-
-      65% {
-        transform: scale(0.98);
-        opacity: 1;
-      }
-
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    .name::after {
+    .name::after{
       content: "";
       position: absolute;
       inset: 0;
       background: linear-gradient(110deg,
-          transparent 0%,
-          rgba(255, 255, 255, 0.35) 45%,
-          rgba(255, 255, 255, 0.65) 50%,
-          rgba(255, 255, 255, 0.35) 55%,
-          transparent 100%);
+        transparent 0%,
+        rgba(255,255,255,0.35) 45%,
+        rgba(255,255,255,0.65) 50%,
+        rgba(255,255,255,0.35) 55%,
+        transparent 100%);
       transform: translateX(-120%);
       animation: shineOnce 10s ease-in-out infinite;
       pointer-events: none;
     }
 
     @keyframes shineOnce {
-      0% {
-        transform: translateX(-120%);
-      }
-
-      8% {
-        transform: translateX(120%);
-      }
-
-      100% {
-        transform: translateX(120%);
-      }
+      0%   { transform: translateX(-120%); }
+      8%   { transform: translateX(120%); }
+      100% { transform: translateX(120%); }
     }
 
     .underline {
       width: 120px;
       height: 1px;
       margin: 18px auto 14px;
-      background: linear-gradient(90deg,
-          transparent,
-          rgba(200, 85, 166, 0.9),
-          rgba(107, 77, 216, 0.9),
-          transparent);
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(200, 85, 166, 0.9),
+        rgba(107, 77, 216, 0.9),
+        transparent
+      );
       opacity: 0.95;
     }
 
     .tiny-note {
       font-size: 12px;
       color: var(--text-soft);
-      opacity: 0.98;
+      opacity: 0.95;
+      margin-top: 4px;
       white-space: pre-line;
-      line-height: 1.7;
-      max-width: 26em;
-      margin: 10px auto 0;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        display: block;
+        padding: 0 10px;
+        overflow-y: auto;
+      }
+      .card {
+        width: 100%;
+        max-width: 480px;
+        margin: 12vh auto 24px;
+        padding: 24px 18px 20px;
+        border-radius: 22px;
+      }
+      .script-title { font-size: 26px; }
+      .main-line { font-size: 20px; }
+      .name {
+        font-size: 19px;
+        letter-spacing: 0.16em;
+      }
+      .floating-letters {
+        font-size: 24px;
+      }
     }
 
     @media (max-width: 480px) {
       .card {
-        padding: 26px 20px 22px;
-        border-radius: 22px;
+        margin-top: 10vh;
+        padding: 22px 16px 18px;
       }
-
-      .script-title {
-        font-size: 28px;
-      }
-
-      .main-line {
-        font-size: 21px;
-      }
-
+      .script-title { font-size: 24px; }
+      .main-line { font-size: 19px; }
       .name {
-        font-size: 19px;
-        letter-spacing: 0.18em;
-      }
-
-      .floating-letters {
-        font-size: 24px;
-      }
-
-      .tiny-note {
-        font-size: 11.5px;
+        font-size: 18px;
+        letter-spacing: 0.14em;
       }
     }
   </style>
 </head>
-
 <body>
   <div class="intro-fog"></div>
 
@@ -540,18 +387,18 @@
 
     <div class="script-title">Happy New Year</div>
 
+    <h1>NEW YEAR</h1>
+
+    <div class="main-line">Happy New Year</div>
+
     <div class="for">FOR</div>
     <div class="name">SHAHAD</div>
 
     <div class="underline"></div>
 
     <div class="tiny-note">
-      Shahad, happy New Year.
-      I wish you a year filled with peace and joy,
-      and moments that place a gentle smile on your heart.
-      May this new year be kinder and more beautiful for you,
-      bringing everything you truly deserve…
-      and may the days ahead carry a purity that reflects your spirit.
+      A little moment made only
+      so you know how precious you are.
     </div>
   </div>
 
@@ -560,7 +407,7 @@
       const card = document.getElementById("card");
       setTimeout(() => {
         card.classList.add("show-card");
-      }, 3300); // كانت 2300، زدناها ثانية
+      }, 2300);
     });
 
     const canvas = document.getElementById("fireworks");
@@ -615,7 +462,7 @@
 
     setInterval(() => {
       createFirework();
-    }, 700);
+    }, 1400);
 
     function draw() {
       ctx.clearRect(0, 0, w, h);
@@ -662,5 +509,4 @@
     draw();
   </script>
 </body>
-
 </html>
