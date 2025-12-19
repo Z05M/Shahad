@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>For Shahad</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&family=Great+Vibes&display=swap" rel="stylesheet"/>
+
+  <style>
+    :root{
+      --night1:#0b0714;
+      --night2:#1a0b2e;
+      --night3:#000000;
+      --glass1:rgba(255,255,255,.10);
+      --glass2:rgba(255,255,255,.05);
+      --border:rgba(255,255,255,.20);
+      --gold:#ffd700;
+      --rose:#c855a6;
+      --soft:#bba7ff;
+      --text:#f6efff;
+      --muted:rgba(246,239,255,.75);
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      min-height:100vh;
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:Poppins,sans-serif;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(255,215,0,.07), transparent 55%),
+        radial-gradient(circle at 20% 20%, rgba(200,85,166,.08), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(107,77,216,.08), transparent 50%),
+        linear-gradient(180deg, var(--night2), var(--night1), var(--night3));
+      color:var(--text);
+      transition: background 1.8s ease;
+      cursor:auto;
+    }
+
+    /* Cinematic dark focus (after wish) */
+    body.cinematic-mode{
+      background: radial-gradient(circle at 50% 45%, #1a0b2e, #000) !important;
+    }
+
+    /* Soft film grain (very subtle) */
+    body::after{
+      content:"";
+      position:fixed;inset:-20%;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E");
+      opacity:.06;
+      mix-blend-mode:overlay;
+      pointer-events:none;
+      z-index:0;
+      animation:grainMove 9s linear infinite;
+      transform:translate3d(0,0,0);
+    }
+    @keyframes grainMove{
+      0%{transform:translate3d(0,0,0)}
+      100%{transform:translate3d(-6%, 4%, 0)}
+    }
+
+    canvas#world{
+      position:fixed;inset:0;
+      z-index:1;
+      pointer-events:none;
+    }
+
+    /* Intro name (letters) */
+    .name-intro{
+      position:fixed;
+      left:50%;top:44%;
+      transform:translate(-50%,-50%);
+      display:flex;
+      gap:10px;
+      letter-spacing:.25em;
+      font-size:32px;
+      text-transform:uppercase;
+      z-index:5;
+      pointer-events:none;
+      user-select:none;
+      filter: drop-shadow(0 10px 24px rgba(255,215,0,.08));
+    }
+    .name-intro span{
+      opacity:0;
+      transform:translate3d(0,18px,0) scale(.98);
+      color: rgba(255,255,255,.9);
+      text-shadow:
+        0 0 16px rgba(255,215,0,.10),
+        0 0 36px rgba(200,85,166,.10);
+      animation: letterIn .9s ease forwards;
+    }
+    .name-intro span:nth-child(1){animation-delay:2.6s}
+    .name-intro span:nth-child(2){animation-delay:2.8s}
+    .name-intro span:nth-child(3){animation-delay:3.0s}
+    .name-intro span:nth-child(4){animation-delay:3.2s}
+    .name-intro span:nth-child(5){animation-delay:3.4s}
+    .name-intro span:nth-child(6){animation-delay:3.6s}
+
+    @keyframes letterIn{
+      0%{opacity:0; transform:translate3d(0,18px,0) scale(.98)}
+      60%{opacity:1}
+      100%{opacity:1; transform:translate3d(0,0,0) scale(1)}
+    }
+    /* fade name away before card */
+    .name-intro.fade{
+      animation: nameOut 1.2s ease forwards;
+    }
+    @keyframes nameOut{
+      0%{opacity:1; filter:blur(0px)}
+      100%{opacity:0; filter:blur(6px); transform:translate(-50%,-52%)}
+    }
+
+    /* Soft fog at beginning */
+    .fog{
+      position:fixed;inset:0;z-index:4;
+      background: radial-gradient(circle at 50% 35%,
+        rgba(255,255,255,.20),
+        rgba(255,255,255,.06) 40%,
+        transparent 70%);
+      backdrop-filter: blur(10px);
+      opacity:1;
+      pointer-events:none;
+      animation:fogFade 2.2s ease 1.2s forwards;
+    }
+    @keyframes fogFade{
+      to{opacity:0; visibility:hidden}
+    }
+
+    /* Card */
+    .wrap{
+      position:relative;
+      width:100%;
+      height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:10;
+      perspective:1200px;
+    }
+    .card{
+      position:relative;
+      width:min(560px, 92vw);
+      padding:44px 34px 96px;
+      border-radius:28px;
+      background: linear-gradient(135deg, var(--glass1), var(--glass2));
+      border:1px solid var(--border);
+      box-shadow:
+        0 26px 80px rgba(0,0,0,.35),
+        0 0 0 1px rgba(255,255,255,.05) inset;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      text-align:center;
+      opacity:0;
+      transform: translateY(26px) scale(.985);
+      transition: opacity 1.2s ease, transform 1.2s ease;
+      transform-style:preserve-3d;
+      overflow:hidden;
+    }
+    .card.show{
+      opacity:1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* One-time light sweep */
+    .card::before{
+      content:"";
+      position:absolute;inset:0;
+      background: linear-gradient(120deg,
+        transparent 20%,
+        rgba(255,255,255,.20) 45%,
+        rgba(255,255,255,.08) 52%,
+        transparent 78%);
+      transform:translateX(-140%) skewX(-10deg);
+      opacity:0;
+      pointer-events:none;
+    }
+    .card.show::before{
+      animation:sweep 2.2s ease 1.0s forwards;
+    }
+    @keyframes sweep{
+      0%{opacity:0; transform:translateX(-140%) skewX(-10deg)}
+      12%{opacity:1}
+      100%{opacity:0; transform:translateX(140%) skewX(-10deg)}
+    }
+
+    .ring{
+      position:absolute;
+      inset:14px;
+      border-radius:22px;
+      border:1px solid rgba(255,215,0,.18);
+      pointer-events:none;
+      opacity:.65;
+      mask-image: radial-gradient(circle at top, black 40%, transparent 78%);
+    }
+
+    .title{
+      font-family:"Great Vibes", cursive;
+      font-size:44px;
+      line-height:1;
+      color: rgba(255,255,255,.92);
+      text-shadow:
+        0 0 26px rgba(255,215,0,.10),
+        0 14px 42px rgba(0,0,0,.35);
+      margin-bottom:10px;
+    }
+    .for{
+      font-size:12px;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      color: var(--muted);
+      margin-bottom:6px;
+    }
+    .name{
+      font-size:22px;
+      letter-spacing:.26em;
+      text-transform:uppercase;
+      font-weight:600;
+      background: linear-gradient(45deg, var(--rose), var(--soft), rgba(255,215,0,.95));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      display:inline-block;
+      transform: translateZ(20px);
+    }
+    .line{
+      width:140px;
+      height:1px;
+      margin:18px auto 14px;
+      background: linear-gradient(90deg, transparent, rgba(255,215,0,.65), rgba(200,85,166,.55), transparent);
+      opacity:.9;
+    }
+    .msg{
+      font-size:13px;
+      line-height:1.85;
+      color: rgba(255,255,255,.82);
+      white-space:pre-line;
+      max-width:30em;
+      margin:0 auto;
+      min-height:140px;
+    }
+    .cursor{
+      display:inline-block;
+      width:8px;
+      height:14px;
+      margin-left:3px;
+      background: rgba(255,215,0,.65);
+      transform: translateY(2px);
+      animation: blink 1s steps(1) infinite;
+      border-radius:2px;
+    }
+    @keyframes blink{ 50%{opacity:0} }
+
+    .wish{
+      position:absolute;
+      left:50%;
+      bottom:34px;
+      transform: translateX(-50%);
+      padding:12px 34px;
+      border-radius:999px;
+      border:1px solid rgba(255,215,0,.55);
+      background: rgba(0,0,0,.08);
+      color: rgba(255,255,255,.92);
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-size:13px;
+      font-family:Poppins,sans-serif;
+      cursor:pointer;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity 1.0s ease, transform .25s ease, background .25s ease;
+      box-shadow: 0 0 0 1px rgba(255,255,255,.03) inset;
+    }
+    .wish.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+    .wish:hover{
+      transform: translateX(-50%) scale(1.04);
+      background: rgba(255,215,0,.10);
+    }
+
+    /* Warp out */
+    .card.warp{
+      pointer-events:none;
+      animation: warpOut 1.55s cubic-bezier(.7,0,.28,1) forwards;
+    }
+    @keyframes warpOut{
+      0%{transform: translateY(0) scale(1); opacity:1; filter:blur(0px)}
+      40%{opacity:.92}
+      100%{transform: translateY(-8px) scale(4.2) translateZ(800px); opacity:0; filter:blur(2px)}
+    }
+
+    /* Final text */
+    .final{
+      position:fixed; inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      z-index:30;
+      pointer-events:none;
+      opacity:0;
+      transition: opacity 1.2s ease;
+      padding:24px;
+    }
+    .final.show{opacity:1}
+    .final h2{
+      font-family:"Great Vibes", cursive;
+      font-size:54px;
+      line-height:1.05;
+      color: rgba(255,255,255,.95);
+      text-shadow:
+        0 0 24px rgba(255,215,0,.28),
+        0 0 60px rgba(255,215,0,.12);
+    }
+    .final small{
+      display:block;
+      margin-top:14px;
+      font-size:13px;
+      color: rgba(255,255,255,.70);
+      letter-spacing:.08em;
+    }
+
+    @media (max-width:480px){
+      .title{font-size:38px}
+      .final h2{font-size:42px}
+      .card{padding:38px 22px 92px}
+      .msg{font-size:12.5px}
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="world"></canvas>
+
+  <div class="fog"></div>
+
+  <div class="name-intro" id="nameIntro" aria-hidden="true">
+    <span>S</span><span>H</span><span>A</span><span>H</span><span>A</span><span>D</span>
+  </div>
+
+  <div class="wrap">
+    <div class="card" id="card" role="dialog" aria-label="New Year message card">
+      <div class="ring"></div>
+
+      <div class="title">Happy New Year</div>
+      <div class="for">FOR</div>
+      <div class="name">SHAHAD</div>
+      <div class="line"></div>
+
+      <div class="msg" id="msg"></div>
+
+      <button class="wish" id="wishBtn" type="button">Make a Wish ✨</button>
+    </div>
+  </div>
+
+  <div class="final" id="final">
+    <div>
+      <h2>May this year be kind to you</h2>
+      <small>— and may your heart always find peace.</small>
+    </div>
+  </div>
+
+  <script>
+    // =========================
+    // 1) Canvas particles (silent cinematic)
+    // =========================
+    const canvas = document.getElementById("world");
+    const ctx = canvas.getContext("2d", { alpha: true });
+
+    let w=0, h=0;
+    function resize(){
+      w = canvas.width  = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    // Two modes: "ambient" (slow breathing dust) and "vortex" (gold wish)
+    let mode = "ambient";
+    const particles = [];
+
+    function rand(min,max){ return min + Math.random()*(max-min); }
+
+    class P{
+      constructor(type){
+        this.type = type;
+        this.reset();
+      }
+      reset(){
+        if(this.type === "ambient"){
+          this.x = rand(0,w);
+          this.y = rand(0,h);
+          this.vx = rand(-0.15,0.15);
+          this.vy = rand(-0.12,0.12);
+          this.r  = rand(0.7, 1.8);
+          this.a  = rand(0.06, 0.18);
+          this.tw = rand(0, Math.PI*2);
+        }else{
+          // vortex starts from center outwards, then slows
+          this.x = w/2; this.y = h/2;
+          const ang = rand(0, Math.PI*2);
+          const spd = rand(1.5, 5.5);
+          this.vx = Math.cos(ang)*spd;
+          this.vy = Math.sin(ang)*spd;
+          this.life = 140;
+          this.max = 140;
+          this.r = rand(0.9, 2.3);
+        }
+      }
+      step(){
+        if(this.type === "ambient"){
+          this.tw += 0.02;
+          this.x += this.vx + Math.sin(this.tw)*0.03;
+          this.y += this.vy + Math.cos(this.tw)*0.03;
+
+          // wrap
+          if(this.x< -20) this.x = w+20;
+          if(this.x> w+20) this.x = -20;
+          if(this.y< -20) this.y = h+20;
+          if(this.y> h+20) this.y = -20;
+        }else{
+          this.x += this.vx;
+          this.y += this.vy;
+          this.vx *= 0.975;
+          this.vy *= 0.975;
+          this.life--;
+        }
+      }
+      draw(){
+        if(this.type === "ambient"){
+          ctx.globalAlpha = this.a;
+          ctx.fillStyle = "rgba(255,215,0,1)";
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }else{
+          const a = Math.max(0, this.life/this.max) * 0.65;
+          ctx.globalAlpha = a;
+          ctx.fillStyle = "rgba(255,215,0,1)";
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+      }
+      dead(){
+        return this.type === "vortex" && this.life <= 0;
+      }
+    }
+
+    function seedAmbient(){
+      particles.length = 0;
+      // keep it light for performance
+      const count = Math.min(140, Math.floor((w*h)/18000));
+      for(let i=0;i<count;i++) particles.push(new P("ambient"));
+    }
+    seedAmbient();
+
+    function animate(){
+      ctx.clearRect(0,0,w,h);
+      // subtle additive feel
+      ctx.globalCompositeOperation = "lighter";
+
+      if(mode==="vortex"){
+        // emit a few per frame only during vortex
+        for(let i=0;i<10;i++) particles.push(new P("vortex"));
+      }
+
+      for(let i=particles.length-1;i>=0;i--){
+        const p = particles[i];
+        p.step();
+        p.draw();
+        if(p.dead()) particles.splice(i,1);
+      }
+
+      // back to normal blend
+      ctx.globalCompositeOperation = "source-over";
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // =========================
+    // 2) Timeline (letters → card → typewriter → button)
+    // =========================
+    const nameIntro = document.getElementById("nameIntro");
+    const card = document.getElementById("card");
+    const msgEl = document.getElementById("msg");
+    const wishBtn = document.getElementById("wishBtn");
+    const final = document.getElementById("final");
+
+    const message =
+`Shahad, happy New Year.
+I wish you a year filled with peace and joy,
+and moments that place a gentle smile on your heart.
+May this new year be kinder and more beautiful for you,
+bringing everything you truly deserve…
+and may the days ahead carry a purity that reflects your spirit.`;
+
+    let i = 0;
+    let typingDone = false;
+
+    function typewriter(){
+      if(i < message.length){
+        msgEl.textContent += message.charAt(i);
+        i++;
+        setTimeout(typewriter, 34); // calm
+      }else{
+        typingDone = true;
+        // show button a bit later (feels intentional)
+        setTimeout(()=> wishBtn.classList.add("show"), 600);
+      }
+    }
+
+    // safety fallback: show button even if something interrupts
+    setTimeout(()=> wishBtn.classList.add("show"), 22000);
+
+    window.addEventListener("load", ()=>{
+      // fade name out around 4.6s then show card
+      setTimeout(()=> nameIntro.classList.add("fade"), 4600);
+
+      setTimeout(()=>{
+        card.classList.add("show");
+      }, 5200);
+
+      setTimeout(()=>{
+        // add cursor while typing
+        const cursor = document.createElement("span");
+        cursor.className = "cursor";
+        msgEl.appendChild(cursor);
+
+        // start typing
+        setTimeout(()=>{
+          // remove cursor from DOM text rendering: we manage via separate node
+          msgEl.removeChild(cursor);
+          msgEl.textContent = "";
+          typewriter();
+        }, 180);
+      }, 6500);
+    });
+
+    // =========================
+    // 3) Wish action (silent cinematic climax)
+    // =========================
+    function makeWish(){
+      if(!typingDone){
+        // if user clicked early, just show button feedback and continue
+        wishBtn.style.transform = "translateX(-50%) scale(0.98)";
+        setTimeout(()=> wishBtn.style.transform = "", 120);
+      }
+
+      wishBtn.disabled = true;
+      wishBtn.style.opacity = "0";
+      wishBtn.style.pointerEvents = "none";
+
+      document.body.classList.add("cinematic-mode");
+      mode = "vortex";
+
+      // warp card out
+      setTimeout(()=> card.classList.add("warp"), 180);
+
+      // show final after warp
+      setTimeout(()=>{
+        final.classList.add("show");
+      }, 1200);
+
+      // stop vortex after some time to save resources
+      setTimeout(()=>{
+        mode = "ambient";
+        // re-seed ambient to keep it clean
+        seedAmbient();
+      }, 2600);
+    }
+
+    wishBtn.addEventListener("click", makeWish);
+
+    // Optional: allow Enter/Space when focused
+    wishBtn.addEventListener("keydown", (e)=>{
+      if(e.key==="Enter" || e.key===" "){
+        e.preventDefault();
+        makeWish();
+      }
+    });
+  </script>
+</body>
+</html>
