@@ -494,7 +494,8 @@ overflow: hidden;
     canvas#fireworks {
       position: fixed;
       inset: 0;
-      z-index: 25;
+      /* keep particles visible even when zooming on the final text */
+      z-index: 60;
       pointer-events: none;
       mix-blend-mode: screen;
       opacity: 0.95;
@@ -503,17 +504,8 @@ overflow: hidden;
       transform: translateZ(0);
     }
 
-    /* Mobile/iOS: avoid blend-mode washing colors to white on the bright glass card */
-    @media (max-width: 820px) {
-      canvas#fireworks { mix-blend-mode: normal; filter: none; opacity: 0.9; }
-    }
-    @supports (-webkit-touch-callout: none) {
-      canvas#fireworks { mix-blend-mode: normal; filter: none; opacity: 0.9; }
-    }
-
-
     
-    #fireworks{ width:100vw; height:100dvh; }
+    #fireworks{ width:100%; height:100%; }
 @media (max-width: 480px) {
       .iamhere-btn{ inset-inline-end: 14px; bottom: calc(14px + env(safe-area-inset-bottom) + var(--vv-bottom)); padding: 10px 18px; font-size: 12px; }
 
@@ -546,16 +538,11 @@ overflow: hidden;
 
     /* Final cinematic message (same as file 2) */
     .final-container {
-      position: fixed;
-      top: var(--vv-top);
-      right: 0;
-      bottom: var(--vv-bottom);
-      left: 0;
-display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
       gap: 18px;
       padding: 0 14px;
       z-index: 50; text-align: center; pointer-events: auto;
-      padding-bottom: calc(10px + env(safe-area-inset-bottom));
     }
     .final-text {
       font-family: "Great Vibes", cursive; font-size: 50px; color: white;
@@ -769,25 +756,13 @@ and may the days ahead carry a purity that reflects your spirit.`;
     /* --- 3. Fireworks --- */
     const canvas = document.getElementById("fireworks");
     const ctx = canvas.getContext("2d");
-
-    // iOS Safari (and small screens) can wash colors to white with blend-mode/screen + "lighter".
-    // Use normal compositing on iOS/mobile to keep colors vivid over the bright glass card.
-    const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-    const isSmallScreen = () => window.matchMedia('(max-width: 820px)').matches;
-    let COMPOSITE = (IS_IOS || isSmallScreen()) ? 'source-over' : 'lighter';
-    const updateComposite = () => {
-      COMPOSITE = (IS_IOS || isSmallScreen()) ? 'source-over' : 'lighter';
-    };
-    updateComposite();
-    window.addEventListener('resize', updateComposite, { passive: true });
-    if (window.visualViewport) window.visualViewport.addEventListener('resize', updateComposite, { passive: true });
-
     let w, h; let fireworks = [];
     let mode = 'fireworks';
     let fireworkTimer;
     let vortexParticles = [];
-    let DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    let DPR = 1;
+    let vvLeft = 0, vvTop = 0;
+    const DPR_CAP = 2;
 
     function updateViewportVars() {
       const vv = window.visualViewport;
@@ -811,15 +786,18 @@ and may the days ahead carry a purity that reflects your spirit.`;
 
     function resize() {
       const box = getViewportBox();
+      vvLeft = box.left || 0;
+      vvTop  = box.top  || 0;
       w = box.w;
       h = box.h;
 
-      // DPR can change with browser zoom / pinch-zoom
-      DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      // DPR can change when the user zooms the browser
+      DPR = Math.max(1, Math.min(DPR_CAP, window.devicePixelRatio || 1));
 
-      // Pin the canvas to the *visual* viewport position (fix: particles "disappear" on zoom/pan)
-      canvas.style.left = (box.left || 0) + 'px';
-      canvas.style.top = (box.top || 0) + 'px';
+      // Pin the canvas to the visual viewport (fixes disappearing/misaligned particles on zoom)
+      canvas.style.left = '0px';
+      canvas.style.top = '0px';
+      canvas.style.transform = `translate(${vvLeft}px, ${vvTop}px)`;
       canvas.style.width = w + 'px';
       canvas.style.height = h + 'px';
 
@@ -846,13 +824,8 @@ function randomPastel() {
       const el = document.querySelector('.final-text');
       if (el) {
         const r = el.getBoundingClientRect();
-        const vv = window.visualViewport;
-
-        // Canvas is positioned at vv.offsetLeft/offsetTop, so convert DOM rect -> canvas coords
-        const ox = vv ? (vv.offsetLeft || 0) : 0;
-        const oy = vv ? (vv.offsetTop || 0) : 0;
-
-        return { x: (r.left - ox) + r.width / 2, y: (r.top - oy) + r.height / 2 };
+        // Convert viewport coords -> canvas coords (canvas is translated by vvLeft/vvTop)
+        return { x: (r.left - vvLeft) + r.width / 2, y: (r.top - vvTop) + r.height / 2 };
       }
       return { x: w / 2, y: h / 2 };
     }
@@ -887,22 +860,10 @@ function randomPastel() {
       draw() {
         const a = Math.max(0, this.life / this.maxLife);
         ctx.globalAlpha = a;
-
-        // On iOS/mobile we draw with normal compositing + glow, so colors stay vivid over the bright card
-        if (COMPOSITE === 'source-over') {
-          ctx.shadowBlur = 14;
-          ctx.shadowColor = this.color;
-        }
-
         ctx.fillStyle = this.color;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
-
-        if (COMPOSITE === 'source-over') {
-          ctx.shadowBlur = 0;
-          ctx.shadowColor = 'transparent';
-        }
         ctx.globalAlpha = 1;
       }
     }
@@ -921,7 +882,7 @@ function randomPastel() {
     
     function draw() {
       ctx.clearRect(0, 0, w, h);
-      ctx.globalCompositeOperation = COMPOSITE;
+      ctx.globalCompositeOperation = "lighter";
 
       if (mode === 'fireworks') {
         for (let i = fireworks.length - 1; i >= 0; i--) {
@@ -936,18 +897,9 @@ function randomPastel() {
             if (p.life <= 0) { dead++; continue; }
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            const _c = p.color.replace("A", a);
-            if (COMPOSITE === 'source-over') {
-              ctx.shadowBlur = 12;
-              ctx.shadowColor = _c;
-            }
-            ctx.fillStyle = _c;
+            ctx.fillStyle = p.color.replace("A", a);
             ctx.fill();
-            if (COMPOSITE === 'source-over') {
-              ctx.shadowBlur = 0;
-              ctx.shadowColor = 'transparent';
-            }
-}
+          }
           if (dead === fw.length) fireworks.splice(i, 1);
         }
       } else if (mode === 'vortex') {
