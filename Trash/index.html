@@ -490,22 +490,22 @@ overflow: hidden;
       box-shadow: 0 0 25px rgba(200, 85, 166, 0.7);
       transform: translateX(-50%) translateZ(105px) scale(1.05);
     }
+.final-container,
+.final-text {
+  transform: translateZ(0);
+  isolation: isolate;
+}
 
-    canvas#fireworks {
-      position: fixed;
-      inset: 0;
-      /* keep particles visible even when zooming on the final text */
-      z-index: 60;
-      pointer-events: none;
-      mix-blend-mode: screen;
-      opacity: 0.95;
-      filter: saturate(1.15) brightness(1.08);
-      will-change: transform;
-      transform: translateZ(0);
-    }
+
+canvas#fireworks {
+  position: fixed;
+  inset: 0;
+  z-index: 9999; /* بدل 25 */
+  pointer-events: none;
+}
 
     
-    #fireworks{ width:100%; height:100%; }
+    #fireworks{ width:100vw; height:100dvh; }
 @media (max-width: 480px) {
       .iamhere-btn{ inset-inline-end: 14px; bottom: calc(14px + env(safe-area-inset-bottom) + var(--vv-bottom)); padding: 10px 18px; font-size: 12px; }
 
@@ -760,9 +760,7 @@ and may the days ahead carry a purity that reflects your spirit.`;
     let mode = 'fireworks';
     let fireworkTimer;
     let vortexParticles = [];
-    let DPR = 1;
-    let vvLeft = 0, vvTop = 0;
-    const DPR_CAP = 2;
+    const DPR = Math.max(1, Math.min(1.5, window.devicePixelRatio || 1));
 
     function updateViewportVars() {
       const vv = window.visualViewport;
@@ -786,18 +784,12 @@ and may the days ahead carry a purity that reflects your spirit.`;
 
     function resize() {
       const box = getViewportBox();
-      vvLeft = box.left || 0;
-      vvTop  = box.top  || 0;
       w = box.w;
       h = box.h;
 
-      // DPR can change when the user zooms the browser
-      DPR = Math.max(1, Math.min(DPR_CAP, window.devicePixelRatio || 1));
-
-      // Pin the canvas to the visual viewport (fixes disappearing/misaligned particles on zoom)
+      // Align canvas to the visual viewport (handles mobile address bar + zoom)
       canvas.style.left = '0px';
       canvas.style.top = '0px';
-      canvas.style.transform = `translate(${vvLeft}px, ${vvTop}px)`;
       canvas.style.width = w + 'px';
       canvas.style.height = h + 'px';
 
@@ -824,8 +816,7 @@ function randomPastel() {
       const el = document.querySelector('.final-text');
       if (el) {
         const r = el.getBoundingClientRect();
-        // Convert viewport coords -> canvas coords (canvas is translated by vvLeft/vvTop)
-        return { x: (r.left - vvLeft) + r.width / 2, y: (r.top - vvTop) + r.height / 2 };
+        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
       }
       return { x: w / 2, y: h / 2 };
     }
