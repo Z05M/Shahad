@@ -1113,295 +1113,64 @@ function createFinalMessage() {
   </script>
 <script>
 (function () {
-  // --- Gift analytics (Clarity tags + events) ---
-  // Notes:
-  // - This does NOT (and cannot) force the phone/system volume up.
-  // - This identifies a "user" by a random ID stored in localStorage (same device/browser).
-  // - IP address is NOT available without a backend or an external IP lookup service.
-
-  const STORAGE_KEY = "gift_user_v2";
-  const SESSION_KEY  = "gift_session_v1";
-
-  const now = () => Date.now();
-  const perfNow = () => (window.performance && performance.now) ? performance.now() : now();
+  const KEY = "gift_user_v1";
 
   function uuid() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-      const r = (Math.random() * 16) | 0;
-      const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return "xxxx-4xxx-yxxx".replace(/[xy]/g, c => {
+      const r = Math.random() * 16 | 0;
+      const v = c === "x" ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
   }
 
-  function safeStr(v) {
-    if (v === null || v === undefined) return "";
-    try { return String(v); } catch { return ""; }
-  }
-
   function fingerprint() {
-    // Lightweight fingerprint (NOT unique globally, just a hint to help you detect new devices)
-    const ua = safeStr(navigator.userAgent);
     return [
-      safeStr(navigator.platform),
-      safeStr(navigator.language),
-      (screen && screen.width ? screen.width : "") + "x" + (screen && screen.height ? screen.height : ""),
-      ua.split(")")[0] || ua.slice(0, 80)
+      navigator.platform || "",
+      navigator.language || "",
+      (screen.width + "x" + screen.height),
+      (navigator.userAgent || "").slice(0, 80)
     ].join("|");
   }
 
-  function getOrCreateUser() {
-    let data = null;
-    try { data = JSON.parse(localStorage.getItem(STORAGE_KEY)); } catch (e) {}
+  let data;
+  try { data = JSON.parse(localStorage.getItem(KEY)); } catch(e) {}
 
-    if (!data || !data.id) {
-      data = { id: uuid(), visits: 0, firstVisit: now(), fingerprint: fingerprint() };
-    }
-
-    data.visits = (data.visits || 0) + 1;
-    data.lastVisit = now();
-
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
-    return data;
-  }
-
-  function getOrCreateSessionId() {
-    let sid = null;
-    try { sid = sessionStorage.getItem(SESSION_KEY); } catch (e) {}
-    if (!sid) {
-      sid = uuid();
-      try { sessionStorage.setItem(SESSION_KEY, sid); } catch (e) {}
-    }
-    return sid;
-  }
-
-  function parseUA(uaRaw) {
-    const ua = safeStr(uaRaw);
-
-    // --- OS ---
-    let os = "Unknown", osVersion = "";
-    if (/Windows NT/i.test(ua)) { os = "Windows"; osVersion = (ua.match(/Windows NT ([0-9.]+)/i) || [])[1] || ""; }
-    else if (/Android/i.test(ua)) { os = "Android"; osVersion = (ua.match(/Android\s([0-9.]+)/i) || [])[1] || ""; }
-    else if (/(iPhone|iPad|iPod)/i.test(ua)) { os = "iOS"; osVersion = (ua.match(/OS\s([0-9_]+)/i) || [])[1]?.replace(/_/g, ".") || ""; }
-    else if (/Mac OS X/i.test(ua)) { os = "macOS"; osVersion = (ua.match(/Mac OS X\s([0-9_]+)/i) || [])[1]?.replace(/_/g, ".") || ""; }
-    else if (/Linux/i.test(ua)) { os = "Linux"; }
-
-    // --- Browser ---
-    let browser = "Unknown", browserVersion = "";
-    // Order matters
-    if (/Edg\//i.test(ua)) { browser = "Edge"; browserVersion = (ua.match(/Edg\/([0-9.]+)/i) || [])[1] || ""; }
-    else if (/OPR\//i.test(ua)) { browser = "Opera"; browserVersion = (ua.match(/OPR\/([0-9.]+)/i) || [])[1] || ""; }
-    else if (/Chrome\//i.test(ua) && !/Edg\//i.test(ua) && !/OPR\//i.test(ua)) { browser = "Chrome"; browserVersion = (ua.match(/Chrome\/([0-9.]+)/i) || [])[1] || ""; }
-    else if (/Safari\//i.test(ua) && /Version\//i.test(ua) && !/Chrome\//i.test(ua)) { browser = "Safari"; browserVersion = (ua.match(/Version\/([0-9.]+)/i) || [])[1] || ""; }
-    else if (/Firefox\//i.test(ua)) { browser = "Firefox"; browserVersion = (ua.match(/Firefox\/([0-9.]+)/i) || [])[1] || ""; }
-
-    // --- Device type (best-effort) ---
-    const isTouch = ("ontouchstart" in window) || (navigator.maxTouchPoints || 0) > 0;
-    const smallScreen = window.matchMedia && window.matchMedia("(max-width: 820px)").matches;
-    const deviceType = smallScreen || isTouch ? "Mobile/Touch" : "Desktop";
-
-    return { os, osVersion, browser, browserVersion, deviceType, ua: ua.slice(0, 180) };
-  }
-
-  function collectDeviceInfo(uaInfo) {
-    const vv = window.visualViewport;
-    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-
-    return {
-      device_type: uaInfo.deviceType,
-      os: uaInfo.os,
-      os_version: uaInfo.osVersion,
-      browser: uaInfo.browser,
-      browser_version: uaInfo.browserVersion,
-      language: safeStr(navigator.language),
-      timezone: safeStr(Intl.DateTimeFormat().resolvedOptions().timeZone || ""),
-      tz_offset_min: safeStr(new Date().getTimezoneOffset()),
-      platform: safeStr(navigator.platform),
-      user_agent: uaInfo.ua,
-      screen: (screen && screen.width ? screen.width : "") + "x" + (screen && screen.height ? screen.height : ""),
-      viewport: (vv ? Math.round(vv.width) : window.innerWidth) + "x" + (vv ? Math.round(vv.height) : window.innerHeight),
-      dpr: safeStr(Math.round((window.devicePixelRatio || 1) * 100) / 100),
-      touch_points: safeStr(navigator.maxTouchPoints || 0),
-      connection_type: safeStr(connection && connection.effectiveType),
-      downlink_mbps: safeStr(connection && connection.downlink),
-      save_data: safeStr(connection && connection.saveData),
-      cores: safeStr(navigator.hardwareConcurrency),
-      memory_gb: safeStr(navigator.deviceMemory),
-      prefers_reduced_motion: safeStr(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+  if (!data) {
+    data = {
+      id: uuid(),
+      visits: 0,
+      firstVisit: Date.now(),
+      fingerprint: fingerprint()
     };
   }
 
-  // --- Clarity helpers ---
-  function claritySet(key, value) {
+  data.visits += 1;
+  data.lastVisit = Date.now();
+  localStorage.setItem(KEY, JSON.stringify(data));
+
+  function sendTags() {
     if (!window.clarity) return false;
-    // Clarity requires key/value as strings (or arrays). We'll stringify safely.
-    window.clarity("set", safeStr(key), safeStr(value));
-    return true;
-  }
-  function clarityEvent(name) {
-    if (!window.clarity) return false;
-    window.clarity("event", safeStr(name));
-    return true;
-  }
-  function clarityIdentify(customId, sessionId, pageId, friendlyName) {
-    if (!window.clarity) return false;
-    // (custom-id is required; session/page/friendly are optional)
-    window.clarity("identify", safeStr(customId), safeStr(sessionId), safeStr(pageId), safeStr(friendlyName));
+
+    window.clarity("set", "user_id", data.id);
+    window.clarity("set", "visit_count", data.visits);
+    window.clarity("set", "first_visit", new Date(data.firstVisit).toLocaleString());
+    window.clarity("set", "last_visit", new Date(data.lastVisit).toLocaleString());
+    window.clarity("set", "fingerprint", data.fingerprint);
+
     return true;
   }
 
-  function waitForClarity(maxMs = 10000) {
-    return new Promise((resolve) => {
-      const start = now();
-      const t = setInterval(() => {
-        if (window.clarity) { clearInterval(t); resolve(true); return; }
-        if (now() - start >= maxMs) { clearInterval(t); resolve(false); }
-      }, 250);
-    });
+  // حاول فورًا، وإذا ما موجودة clarity بعد، حاول كم مرة
+  if (!sendTags()) {
+    let tries = 0;
+    const t = setInterval(() => {
+      tries++;
+      if (sendTags() || tries >= 20) clearInterval(t); // ~10 ثواني
+    }, 500);
   }
-
-  // --- init ---
-  const user = getOrCreateUser();
-  const sessionId = getOrCreateSessionId();
-  const pageId = uuid();
-  const uaInfo = parseUA(navigator.userAgent);
-  const deviceInfo = collectDeviceInfo(uaInfo);
-
-  const t0 = perfNow();
-  const marks = Object.create(null);
-  const mark = (k) => { if (marks[k] == null) marks[k] = Math.round(perfNow() - t0); };
-
-  function sendBaseTags() {
-    // Identify (helps filter users/sessions/pages)
-    clarityIdentify(user.id, sessionId, pageId, "gift");
-
-    // Persistent user info
-    claritySet("gift_user_id", user.id);
-    claritySet("visit_count", user.visits);
-    claritySet("first_visit", new Date(user.firstVisit).toISOString().slice(0, 10));
-    claritySet("last_visit", new Date(user.lastVisit).toISOString().slice(0, 10));
-    claritySet("fingerprint", user.fingerprint);
-
-    // Device info
-    for (const k in deviceInfo) claritySet(k, deviceInfo[k]);
-  }
-
-  waitForClarity().then((ok) => {
-    if (!ok) return;
-    sendBaseTags();
-    clarityEvent("page_open");
-  });
-
-  // --- stage timing via observers ---
-  function observeClass(el, className, onHit) {
-    if (!el) return;
-    if (el.classList && el.classList.contains(className)) { onHit(); return; }
-    const obs = new MutationObserver(() => {
-      if (el.classList && el.classList.contains(className)) {
-        try { onHit(); } finally { obs.disconnect(); }
-      }
-    });
-    obs.observe(el, { attributes: true, attributeFilter: ["class"] });
-  }
-
-  // Card shown
-  observeClass(document.getElementById("card"), "show-card", () => {
-    mark("card_shown");
-    claritySet("t_card_shown_ms", marks.card_shown);
-    clarityEvent("card_shown");
-  });
-
-  // Go button appears
-  observeClass(document.getElementById("wishBtn"), "show-btn", () => {
-    mark("go_visible");
-    claritySet("t_go_visible_ms", marks.go_visible);
-    if (marks.card_shown != null) claritySet("card_to_go_visible_ms", marks.go_visible - marks.card_shown);
-    clarityEvent("go_visible");
-  });
-
-  // Final container appears
-  const bodyObs = new MutationObserver(() => {
-    const final = document.querySelector(".final-container");
-    if (final) {
-      bodyObs.disconnect();
-      mark("final_shown");
-      claritySet("t_final_shown_ms", marks.final_shown);
-      if (marks.go_click != null) claritySet("go_to_final_ms", marks.final_shown - marks.go_click);
-      clarityEvent("final_shown");
-
-      // Observe "I am here" button show class
-      const iamBtn = final.querySelector(".iamhere-btn");
-      observeClass(iamBtn, "show", () => {
-        mark("iam_visible");
-        claritySet("t_iam_visible_ms", marks.iam_visible);
-        if (marks.final_shown != null) claritySet("final_to_iam_visible_ms", marks.iam_visible - marks.final_shown);
-        clarityEvent("iam_visible");
-      });
-    }
-  });
-  bodyObs.observe(document.documentElement || document.body, { childList: true, subtree: true });
-
-  // --- wrap existing functions to log clicks (without changing your behavior) ---
-  function wrap(fnName, before) {
-    const orig = window[fnName];
-    if (typeof orig !== "function") return;
-    window[fnName] = function (...args) {
-      try { before && before.apply(this, args); } catch (e) {}
-      return orig.apply(this, args);
-    };
-  }
-
-  wrap("makeAWish", () => {
-    mark("go_click");
-    claritySet("t_go_click_ms", marks.go_click);
-    if (marks.card_shown != null) claritySet("card_to_go_click_ms", marks.go_click - marks.card_shown);
-    clarityEvent("go_click");
-  });
-
-  wrap("iAmHere", () => {
-    mark("iam_click");
-    claritySet("t_iam_click_ms", marks.iam_click);
-    if (marks.iam_visible != null) claritySet("iam_visible_to_click_ms", marks.iam_click - marks.iam_visible);
-    clarityEvent("iam_click");
-  });
-
-  // If showMemeFor exists, track meme shows
-  wrap("showMemeFor", () => {
-    clarityEvent("meme_shown");
-  });
-
-  // Track any button click (best-effort label)
-  document.addEventListener("click", (e) => {
-    const btn = e.target && e.target.closest ? e.target.closest("button") : null;
-    if (!btn) return;
-    const label = safeStr(btn.id || btn.getAttribute("data-track") || btn.textContent || btn.className)
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, "_")
-      .slice(0, 40);
-    if (label) clarityEvent("btn_" + label);
-  }, { capture: true, passive: true });
-
-  // --- active time (how long the tab stayed visible) ---
-  let activeStart = perfNow();
-  let activeTotal = 0;
-
-  function flushActive(reason) {
-    try {
-      activeTotal += (perfNow() - activeStart);
-      activeStart = perfNow();
-      claritySet("active_time_ms", Math.round(activeTotal));
-      if (reason) clarityEvent(reason);
-    } catch (e) {}
-  }
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden") flushActive("page_hidden");
-    else { activeStart = perfNow(); clarityEvent("page_visible"); }
-  });
-
-  window.addEventListener("beforeunload", () => flushActive("page_exit"));
 })();
 </script>
+
 </body>
 
 </html>
