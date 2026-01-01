@@ -7,7 +7,7 @@
   <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        t=l.createElement(r);t.async=1;t.src="https://wwww.clarity.ms/tag/"+i;
         y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
     })(window, document, "clarity", "script", "uo8aha1qu6");
 </script>
@@ -32,6 +32,14 @@
     }
 
   html { color-scheme: light; }
+@keyframes btnPulse{
+  0%,100% { transform: translateX(-50%) translateZ(100px) scale(1); }
+  50%     { transform: translateX(-50%) translateZ(100px) scale(1.06); }
+}
+
+.wish-btn.show-btn{
+  animation: btnPulse 1.6s ease-in-out infinite;
+}
 
   @media (prefers-color-scheme: dark) {
     html { color-scheme: light; }
@@ -767,7 +775,7 @@ and may the days ahead carry a purity that reflects your spirit.`;
         // وبعد فترة قصيرة يطلع الزر
         setTimeout(() => {
           wishBtn.classList.add("show-btn");
-        }, 6000);
+        }, 4000);
 
         // إطلاقات بسيطة بعد ظهور الكارت
         setTimeout(() => { massiveBurst(); }, 400);
